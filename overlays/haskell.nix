@@ -394,7 +394,10 @@ self: super: {
                 { plan-pkgs = plan.pkgs;
                   pkg-def-extras = args.pkg-def-extras or [];
                   modules = (args.modules or [])
-                          ++ self.lib.optional (args ? ghc) { ghc.package = args.ghc; };
+                          ++ self.lib.optional (args ? ghc) { ghc.package = args.ghc; }
+                          ++ self.lib.optional (args ? cache) (mkCacheModule args.cache);
+
+
                 };
             in { inherit (pkg-set.config) hsPkgs; plan-nix = plan.nix; };
 
@@ -434,7 +437,7 @@ self: super: {
         # In your tests module add something that is effectively
         #   testProjectPlan = withInputs project.plan-nix;
         withInputs = self.recurseIntoAttrs;
-  
+
         # Add this to your tests to make all the dependencies of haskell.nix
         # are tested and cached.
         haskellNixRoots = self.recurseIntoAttrs {
